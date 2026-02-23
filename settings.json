@@ -1,0 +1,10 @@
+{
+    "smart_battery": true,
+    "battery_threshold": 20,
+    "thermal_control": true,
+    "thermal_limit": 90,
+    "autostart": false,
+    "hotkey_enabled": true,
+    "hotkey": "ctrl+alt+t",
+    "minimize_to_tray": true
+}

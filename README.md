@@ -1,16 +1,17 @@
-# Ultra Minimal Turbo Boost Switch for Windows ⚡
+# BoostSwitch (Modern) ⚡
 
-A lightweight, minimalist Python application to toggle **Processor Performance Boost Mode** (Turbo Boost) on Windows. Useful for saving battery or reducing heat/fan noise without digging through confusing power plan settings.
+A lightweight, minimalist Python application to toggle **Processor Performance Boost Mode** (Turbo Boost) on Windows. Useful for saving battery or reducing heat/fan noise without digging through confusing power plan settings. Now completely revamped with a modern UI and automation features.
 
 ![Icon](icon.ico)
 
 ## Features 🚀
-- **Minimalist UI:** Clean white simplified interface with no clutter.
-- **Dynamic Feedback:** Clearly shows "Turbo AÇIK" (ON) or "Turbo KAPALI" (OFF).
-- **Custom Controls:** Modern pill-shaped toggle switches drawn natively in canvas.
-- **Auto-Sync:** Detects current system state on launch and focus.
-- **Safe:** Uses standard Windows `powercfg` commands safely.
-- **No Dependencies:** Uses only standard Python libraries (`tkinter`, `subprocess`, `ctypes`).
+- **Modern UI:** Built with CustomTkinter for a native Windows 11 dark/light mode experience.
+- **Smart Battery Saver:** Automatically disables Turbo when your battery drops below a set threshold.
+- **Thermal Throttling Control:** Protects your device by disabling Turbo if the CPU temperature exceeds a safe limit.
+- **Game/App Profiles:** Forces Turbo ON when specific applications (like games or video editors) are running.
+- **System Tray:** Runs silently in the background. Right-click the tray icon for quick toggles.
+- **Global Hotkeys:** Toggle Turbo from anywhere (default `Ctrl+Shift+T`).
+- **Auto-Start:** Optionally start with Windows automatically.
 
 ## How It Works ⚙️
 It modifies the **Processor performance boost mode** setting in the active power plan via `powercfg`.
@@ -19,19 +20,22 @@ It modifies the **Processor performance boost mode** setting in the active power
 
 ## Installation & Usage 📦
 
-### Running form Source
-1. Clone the repository.
-2. Run with Python:
+### Running from Source
+1. Install dependencies (we recommend setting up a virtual environment):
    ```bash
-   python BoostSwitch.py
+   pip install -r requirements.txt
+   ```
+2. Run the application:
+   ```bash
+   python app.py
    ```
 
 ### Building Executable
 To create a standalone `.exe` with the icon:
 ```bash
-pyinstaller --noconsole --onefile --icon=icon.ico --add-data "icon.ico;." BoostSwitch.py
+pyinstaller --noconsole --onefile --icon=icon.ico --add-data "icon.ico;." app.py
 ```
 
 ## Requirements
 - Windows 10/11
-- Python 3.x
+- Python 3.10+

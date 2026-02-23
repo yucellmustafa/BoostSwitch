@@ -1,0 +1,7 @@
+customtkinter
+pystray
+Pillow
+psutil
+keyboard
+wmi
+pywin32

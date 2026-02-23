@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoostSwitch Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="bg-fx">
+        <div class="blob blue"></div>
+        <div class="blob purple"></div>
+    </div>
+
+    <div class="container">
+        <header class="glass-panel header">
+            <div class="logo">
+                <span class="icon">⚡</span>
+                <span class="text">BoostSwitch <span class="badge">V2</span></span>
+            </div>
+            <div class="status-indicator">
+                <div class="dot" id="connection-dot"></div>
+                <span id="connection-text">Connected</span>
+            </div>
+        </header>
+
+        <main class="grid-layout">
+            <!-- Left Column: Controls & Stats -->
+            <div class="left-col">
+                <section class="glass-panel main-controls">
+                    <h2 class="title">Turbo Control</h2>
+                    <div class="control-row">
+                        <div class="control-card" id="card-ac" onclick="toggleTurbo('AC')">
+                            <div class="icon-wrap">🔌</div>
+                            <div class="card-info">
+                                <h3>AC Power</h3>
+                                <p id="status-ac">Loading...</p>
+                            </div>
+                            <div class="switch-ui" id="switch-ac"></div>
+                        </div>
+                        <div class="control-card" id="card-dc" onclick="toggleTurbo('DC')">
+                            <div class="icon-wrap">🔋</div>
+                            <div class="card-info">
+                                <h3>Battery</h3>
+                                <p id="status-dc">Loading...</p>
+                            </div>
+                            <div class="switch-ui" id="switch-dc"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-panel stats-panel">
+                    <h2 class="title">System Telemetry</h2>
+                    <div class="telemetry-grid">
+                        <div class="telemetry-card temp">
+                            <div class="t-icon">🌡️</div>
+                            <div class="t-val" id="val-temp">--<small>°C</small></div>
+                            <div class="t-label" id="lbl-temp">CPU Temp</div>
+                        </div>
+                        <div class="telemetry-card battery">
+                            <div class="t-icon">⚡</div>
+                            <div class="t-val" id="val-bat">--<small>%</small></div>
+                            <div class="t-label">Battery Level</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: Settings & Apps -->
+            <div class="right-col">
+                <section class="glass-panel settings-panel">
+                    <h2 class="title">Smart Constraints</h2>
+                    <div class="setting-row">
+                        <div class="s-info">
+                            <h4>Thermal Throttling</h4>
+                            <p>Disable Turbo if CPU gets too hot.</p>
+                        </div>
+                        <div class="s-action">
+                            <input type="number" id="inp-th" min="50" max="95" onchange="saveSettings()"> °C
+                            <label class="toggle">
+                                <input type="checkbox" id="chk-th" onchange="saveSettings()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="s-info">
+                            <h4>Battery Saver</h4>
+                            <p>Disable Turbo if battery drops below.</p>
+                        </div>
+                        <div class="s-action">
+                            <input type="number" id="inp-bat" min="10" max="60" onchange="saveSettings()"> %
+                            <label class="toggle">
+                                <input type="checkbox" id="chk-bat" onchange="saveSettings()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="s-info">
+                            <h4>Global Hotkey</h4>
+                            <p id="hotkey-display">Current: <strong>None</strong></p>
+                        </div>
+                        <div class="s-action">
+                            <button class="btn-secondary" id="btn-hotkey" onclick="recordHotkey()">Record</button>
+                            <button class="btn-secondary" onclick="clearHotkey()"
+                                style="color: var(--accent-red);">Clear</button>
+                            <label class="toggle">
+                                <input type="checkbox" id="chk-hk" onchange="saveSettings()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-row last">
+                        <div class="s-info">
+                            <h4>Auto-Start with Windows</h4>
+                        </div>
+                        <div class="s-action">
+                            <label class="toggle">
+                                <input type="checkbox" id="chk-start" onchange="saveSettings()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>
