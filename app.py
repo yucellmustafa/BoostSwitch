@@ -87,7 +87,7 @@ def api_settings():
     else:
         # GET
         keys = ["smart_battery", "battery_threshold", "thermal_control", 
-                "thermal_limit", "app_profiles_enabled", "autostart", 
+                "thermal_limit", "autostart", 
                 "hotkey_enabled", "hotkey", "minimize_to_tray"]
         ret = {k: settings.get(k) for k in keys}
         return jsonify(ret)

@@ -5,6 +5,6 @@
     "thermal_limit": 90,
     "autostart": false,
     "hotkey_enabled": true,
-    "hotkey": "ctrl+alt+t",
+    "hotkey": "ctrl+shift+t",
     "minimize_to_tray": true
 }
