@@ -5,11 +5,10 @@ A lightweight, minimalist Python application to toggle **Processor Performance B
 ![Icon](icon.ico)
 
 ## Features 🚀
-- **Modern UI:** Built with CustomTkinter for a native Windows 11 dark/light mode experience.
+- **Modern Web Interface:** A beautiful, responsive dashboard served locally via Flask.
 - **Smart Battery Saver:** Automatically disables Turbo when your battery drops below a set threshold.
 - **Thermal Throttling Control:** Protects your device by disabling Turbo if the CPU temperature exceeds a safe limit.
-- **Game/App Profiles:** Forces Turbo ON when specific applications (like games or video editors) are running.
-- **System Tray:** Runs silently in the background. Right-click the tray icon for quick toggles.
+- **System Tray:** Runs silently in the background. Right-click the tray icon for quick toggles and real-time telemetry.
 - **Global Hotkeys:** Toggle Turbo from anywhere (default `Ctrl+Shift+T`).
 - **Auto-Start:** Optionally start with Windows automatically.
 
@@ -31,9 +30,9 @@ It modifies the **Processor performance boost mode** setting in the active power
    ```
 
 ### Building Executable
-To create a standalone `.exe` with the icon:
+To create a standalone `.exe` without console windows and packaging all required web assets:
 ```bash
-pyinstaller --noconsole --onefile --icon=icon.ico --add-data "icon.ico;." app.py
+pyinstaller --noconsole --onefile --icon=icon.ico --add-data "icon.ico;." --add-data "templates;templates" --add-data "static;static" app.py
 ```
 
 ## Requirements

@@ -8,8 +8,14 @@ import ctypes
 import keyboard
 from flask import Flask, jsonify, request, render_template, send_file
 
-# Ensure the app can find the modules if running from executable
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Determine if running as a frozen executable (PyInstaller)
+if getattr(sys, 'frozen', False):
+    base_dir = sys._MEIPASS
+else:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Ensure the app can find the modules
+sys.path.insert(0, base_dir)
 
 from core.settings import SettingsManager
 from core.monitors import SystemMonitor
@@ -23,7 +29,9 @@ monitor = SystemMonitor()
 engine = TurboEngine(settings, monitor)
 hotkey_mgr = HotkeyManager(settings, engine)
 
-app = Flask(__name__)
+app = Flask(__name__, 
+            template_folder=os.path.join(base_dir, 'templates'),
+            static_folder=os.path.join(base_dir, 'static'))
 # disable flask logging to keep terminal clean
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)

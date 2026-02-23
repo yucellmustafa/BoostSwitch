@@ -1,6 +1,7 @@
 import pystray
 from PIL import Image, ImageDraw
 import os
+import sys
 import threading
 import time
 from core.settings import get_app_dir
@@ -23,7 +24,12 @@ class TrayApp:
         }
 
     def create_image(self):
-        icon_path = os.path.join(get_app_dir(), "icon.ico")
+        if getattr(sys, 'frozen', False):
+            base_dir = sys._MEIPASS
+        else:
+            base_dir = get_app_dir()
+            
+        icon_path = os.path.join(base_dir, "icon.ico")
         try:
             return Image.open(icon_path)
         except Exception:
