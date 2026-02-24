@@ -5,6 +5,8 @@ A lightweight, minimalist Python application to toggle **Processor Performance B
 ![Icon](icon.ico)
 ![Screenshot](screenshot.png)
 
+> **Note:** This application is primarily designed and tested for laptops with **AMD APU (Ryzen)** processors. While it may work on some Intel systems depending on their power management implementation, full compatibility is not guaranteed.
+
 ## Features 🚀
 - **Modern Web Interface:** A beautiful, responsive, glass-morphism dashboard served locally via Flask.
 - **Auto-Turbo Apps:** Automatically enables Turbo when specified applications (e.g., games, heavy workloads) are running. Easily add trigger apps by dragging and dropping `.exe` files into the dashboard or pasting via `Ctrl+V`.
