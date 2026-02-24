@@ -24,6 +24,7 @@ class TurboEngine:
         self._last_dc = self.dc_pref
         self._last_temp = None
         self._last_battery = None
+        self._last_active_apps = []
 
     def run_command(self, cmd):
         startupinfo = subprocess.STARTUPINFO()
@@ -101,10 +102,10 @@ class TurboEngine:
             self.change_state("DC", not dc_on)
 
     def add_listener(self, func):
-        """Register callback for UI updates. Func should accept (ac_on, dc_on, temp, battery)"""
+        """Register callback for UI updates. Func should accept (ac_on, dc_on, temp, battery, active_apps)"""
         self.listeners.append(func)
 
-    def notify_listeners(self, ac_on=None, dc_on=None, temp=None, battery=None):
+    def notify_listeners(self, ac_on=None, dc_on=None, temp=None, battery=None, active_apps=None):
         if ac_on is not None: self._last_ac = ac_on
         if dc_on is not None: self._last_dc = dc_on
         
@@ -118,10 +119,12 @@ class TurboEngine:
         else: 
             self._last_battery, _ = self.monitor.get_battery_info()
 
+        if active_apps is not None: self._last_active_apps = active_apps
+
         for lst in self.listeners:
             try:
-                lst(self._last_ac, self._last_dc, self._last_temp, self._last_battery)
-            except:
+                lst(self._last_ac, self._last_dc, self._last_temp, self._last_battery, self._last_active_apps)
+            except Exception as e:
                 pass
 
     def start_monitoring(self):
@@ -163,11 +166,14 @@ class TurboEngine:
                 target_dc = False
 
         # 2. Auto-Turbo (Medium Priority Overrule)
+        active_apps = []
         if self.settings.get("auto_turbo_enabled"):
             target_apps = self.settings.get("auto_turbo_apps")
-            if target_apps and self.monitor.is_any_app_running(target_apps):
-                target_ac = True
-                target_dc = True
+            if target_apps:
+                active_apps = self.monitor.get_running_target_apps(target_apps)
+                if active_apps:
+                    target_ac = True
+                    target_dc = True
 
         # 3. Thermal Control (Highest Priority Overrule)
         if self.settings.get("thermal_control"):
@@ -195,4 +201,4 @@ class TurboEngine:
         if changed:
             self.run_command(f"powercfg /setactive {guid}")
         
-        self.notify_listeners(self._last_ac, self._last_dc, temp, bat_percent)
+        self.notify_listeners(self._last_ac, self._last_dc, temp, bat_percent, active_apps)

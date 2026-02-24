@@ -72,6 +72,17 @@ let autoTurboApps = []; async function fetchStatus() {
             cardBat.classList.remove('warning');
         }
 
+        // Update active apps highlight
+        const activeApps = data.active_apps || [];
+        document.querySelectorAll('.app-chip').forEach(chip => {
+            const appName = chip.dataset.app;
+            if (activeApps.includes(appName)) {
+                chip.classList.add('running');
+            } else {
+                chip.classList.remove('running');
+            }
+        });
+
     } catch (e) {
         document.getElementById('connection-dot').classList.remove('connected');
         document.getElementById('connection-text').innerText = 'Disconnected';
@@ -189,12 +200,28 @@ async function clearHotkey() {
 function renderAutoApps() {
     const container = document.getElementById('auto-apps-list');
     container.innerHTML = '';
-    autoTurboApps.forEach((app, index) => {
+
+    // Sort apps alphabetically
+    const sortedApps = [...autoTurboApps].sort((a, b) => a.localeCompare(b));
+
+    sortedApps.forEach((app) => {
+        const originalIndex = autoTurboApps.indexOf(app);
         const chip = document.createElement('div');
         chip.className = 'app-chip';
+        // We use the original exact string for dataset to match process names
+        chip.dataset.app = app;
+
+        // Lowercase for display
+        const displayApp = app.toLowerCase();
+
+        // Generate a consistent color based on the app name
+        const hue = app.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 360;
+        const initial = displayApp.charAt(0).toUpperCase();
+
         chip.innerHTML = `
-            <span>${app}</span>
-            <button onclick="removeAutoApp(${index})">&times;</button>
+            <div class="app-icon" style="background: hsla(${hue}, 70%, 60%, 0.9);">${initial}</div>
+            <span class="app-name-chip">${displayApp}</span>
+            <button onclick="removeAutoApp(${originalIndex})" title="Remove">&times;</button>
         `;
         container.appendChild(chip);
     });
@@ -215,6 +242,16 @@ function removeAutoApp(index) {
     autoTurboApps.splice(index, 1);
     renderAutoApps();
     saveSettings();
+}
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (file && file.name) {
+        document.getElementById('inp-auto-app').value = file.name;
+        addAutoApp();
+    }
+    // Reset input so the same file can be selected again if removed
+    event.target.value = '';
 }
 
 // Init

@@ -8,5 +8,9 @@
     "hotkey": "ctrl+shift+t",
     "minimize_to_tray": true,
     "auto_turbo_enabled": true,
-    "auto_turbo_apps": []
+    "auto_turbo_apps": [
+        "capcut.exe",
+        "affinity.exe",
+        "SLDWORKS.exe"
+    ]
 }

@@ -41,15 +41,17 @@ global_state = {
     "dc_on": False,
     "temp": None,
     "battery": None,
-    "last_update": 0
+    "last_update": 0,
+    "active_apps": []
 }
 
-def on_engine_update(ac_on, dc_on, temp, battery):
+def on_engine_update(ac_on, dc_on, temp, battery, active_apps=[]):
     global_state["ac_on"] = ac_on
     global_state["dc_on"] = dc_on
     global_state["temp"] = temp
     global_state["battery"] = battery
     global_state["last_update"] = time.time()
+    global_state["active_apps"] = active_apps
 
 engine.add_listener(on_engine_update)
 
@@ -64,7 +66,8 @@ def api_status():
         "dc_on": global_state["dc_on"],
         "temp": global_state["temp"],
         "battery": global_state["battery"],
-        "last_update": global_state["last_update"]
+        "last_update": global_state["last_update"],
+        "active_apps": global_state["active_apps"]
     })
 
 @app.route("/api/state", methods=["POST"])

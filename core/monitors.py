@@ -30,25 +30,26 @@ class SystemMonitor:
         """Immediately returns the last cached CPU temperature."""
         return self._last_temp
 
-    def is_any_app_running(self, target_apps):
-        """Checks if any application in the target_apps list is currently running."""
+    def get_running_target_apps(self, target_apps):
+        """Checks target apps and returns a list of the ones currently running."""
         if not target_apps:
-            return False
+            return []
             
-        target_apps_lower = [app.lower() for app in target_apps]
+        target_apps_lower = {app.lower(): app for app in target_apps}
+        running = set()
         
         try:
             for proc in psutil.process_iter(['name']):
                 try:
                     name = proc.info.get('name')
                     if name and name.lower() in target_apps_lower:
-                        return True
+                        running.add(target_apps_lower[name.lower()])
                 except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                     pass
         except Exception as e:
             print(f"[Monitor] Process iteration error: {e}")
             
-        return False
+        return list(running)
 
     def _update_loop(self):
         """Persistent background loop to poll hardware metrics."""
