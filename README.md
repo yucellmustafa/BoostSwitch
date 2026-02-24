@@ -3,6 +3,7 @@
 A lightweight, minimalist Python application to toggle **Processor Performance Boost Mode** (Turbo Boost) on Windows. Useful for saving battery or reducing heat/fan noise without digging through confusing power plan settings. Now completely revamped with a modern Web UI and advanced automation features.
 
 ![Icon](icon.ico)
+![Screenshot](screenshot.png)
 
 ## Features 🚀
 - **Modern Web Interface:** A beautiful, responsive, glass-morphism dashboard served locally via Flask.
