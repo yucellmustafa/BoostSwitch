@@ -15,7 +15,7 @@ class SystemMonitor:
         self._last_battery = (None, True) # (percent, is_plugged)
         
         # History of zone readings to identify static/fake sensors
-        self._zone_history = {}
+        self._zone_min_max = {} # {zone_id: {'min': temp, 'max': temp, 'read_count': int}}
         self._history_lock = threading.Lock()
         
         self._running = True
@@ -126,34 +126,52 @@ class SystemMonitor:
     def _pick_best_zone(self, current_readings):
         with self._history_lock:
             candidates = []
-            for zone_id, temp in current_readings:
-                if zone_id not in self._zone_history:
-                    self._zone_history[zone_id] = []
+            
+            # Known dummy/ambient sensor values that often stay completely flat
+            dummy_values = {27.8, 27.85, 30.0, 40.0, 60.0, 83.0, 84.0}
+            
+            for zone_id, temp_raw in current_readings:
+                # Round to 1 decimal place to avoid floating point noise on flat sensors
+                temp = round(temp_raw, 1)
                 
-                self._zone_history[zone_id].append(temp)
-                if len(self._zone_history[zone_id]) > 10:
-                    self._zone_history[zone_id].pop(0)
+                if zone_id not in self._zone_min_max:
+                    self._zone_min_max[zone_id] = {'min': temp, 'max': temp, 'read_count': 0}
                 
-                history = self._zone_history[zone_id]
-                is_static = False
-                if len(history) >= 5 and all(x == history[0] for x in history):
-                    is_static = True
+                stats = self._zone_min_max[zone_id]
+                stats['read_count'] += 1
                 
-                if abs(temp - 83.0) < 0.1 or abs(temp - 30.0) < 0.1:
-                    is_static = True
+                if temp < stats['min']: stats['min'] = temp
+                if temp > stats['max']: stats['max'] = temp
+                
+                variance = stats['max'] - stats['min']
+                has_varied = variance > 0.5 # Has varied by more than 0.5 degrees lifetime
+                is_known_dummy = any(abs(temp - dummy) <= 0.2 for dummy in dummy_values)
+                
+                # A sensor is considered "dynamically valid" if it has varied, OR if we don't have enough reads yet to know
+                # BUT if it's a known dummy value and hasn't varied, it's immediately suspect even early on.
+                is_valid = True
+                
+                # If we've watched it for 15 reads (15 seconds) and it hasn't varied at all, it's fake.
+                if stats['read_count'] >= 15 and not has_varied:
+                    is_valid = False
+                
+                # If it's a known fake value and hasn't varied (even early), fake.
+                if is_known_dummy and not has_varied:
+                    is_valid = False
 
                 candidates.append({
                     'id': zone_id,
-                    'temp': temp,
-                    'static': is_static,
-                    'variance': max(history) - min(history) if history else 0
+                    'temp': temp_raw, # use the raw temperature for actual display/return
+                    'valid': is_valid
                 })
 
-            dynamic = [c for c in candidates if not c['static']]
-            if dynamic:
-                dynamic.sort(key=lambda x: (x['variance'], x['temp']), reverse=True)
-                return dynamic[0]['temp']
+            valid_dynamic = [c for c in candidates if c['valid']]
+            if valid_dynamic:
+                # Return the highest valid temperature (CPU is almost always the hottest valid ACPI zone)
+                valid_dynamic.sort(key=lambda x: x['temp'], reverse=True)
+                return valid_dynamic[0]['temp']
             
+            # Fallback: if absolutely nothing is valid (e.g. initial bootup before variance happens), just return highest altogether
             candidates.sort(key=lambda x: x['temp'], reverse=True)
             return candidates[0]['temp'] if candidates else None
 

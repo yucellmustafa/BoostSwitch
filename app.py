@@ -59,6 +59,10 @@ engine.add_listener(on_engine_update)
 def index():
     return render_template("index.html")
 
+@app.route("/favicon.ico")
+def favicon():
+    return send_file(os.path.join(base_dir, 'icon.ico'), mimetype='image/vnd.microsoft.icon')
+
 @app.route("/api/status")
 def api_status():
     return jsonify({
