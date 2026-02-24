@@ -157,14 +157,22 @@ class TurboEngine:
         target_ac = self.ac_pref
         target_dc = self.dc_pref
 
-        # Apply overrules
+        # 1. Smart Battery (Lowest Priority Overrule)
+        if self.settings.get("smart_battery") and not is_plugged and bat_percent is not None:
+            if bat_percent <= self.settings.get("battery_threshold"):
+                target_dc = False
+
+        # 2. Auto-Turbo (Medium Priority Overrule)
+        if self.settings.get("auto_turbo_enabled"):
+            target_apps = self.settings.get("auto_turbo_apps")
+            if target_apps and self.monitor.is_any_app_running(target_apps):
+                target_ac = True
+                target_dc = True
+
+        # 3. Thermal Control (Highest Priority Overrule)
         if self.settings.get("thermal_control"):
             if temp is not None and temp >= self.settings.get("thermal_limit"):
                 target_ac = False
-                target_dc = False
-
-        if self.settings.get("smart_battery") and not is_plugged and bat_percent is not None:
-            if bat_percent <= self.settings.get("battery_threshold"):
                 target_dc = False
 
         # Only check current OS state if cache disagrees with targets

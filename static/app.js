@@ -1,6 +1,5 @@
 let state = {};
-
-async function fetchStatus() {
+let autoTurboApps = []; async function fetchStatus() {
     try {
         const res = await fetch('/api/status');
         const data = await res.json();
@@ -93,6 +92,10 @@ async function fetchSettings() {
     document.getElementById('hotkey-display').innerHTML = `Current: <strong>${data.hotkey || "None"}</strong>`;
 
     document.getElementById('chk-start').checked = data.autostart;
+
+    document.getElementById('chk-auto-turbo').checked = !!data.auto_turbo_enabled;
+    autoTurboApps = data.auto_turbo_apps || [];
+    renderAutoApps();
 }
 
 function showToast(message, type = 'info') {
@@ -136,7 +139,9 @@ async function saveSettings() {
         battery_threshold: parseInt(document.getElementById('inp-bat').value),
         smart_battery: document.getElementById('chk-bat').checked,
         hotkey_enabled: document.getElementById('chk-hk').checked,
-        autostart: document.getElementById('chk-start').checked
+        autostart: document.getElementById('chk-start').checked,
+        auto_turbo_enabled: document.getElementById('chk-auto-turbo').checked,
+        auto_turbo_apps: autoTurboApps
     };
 
     await fetch('/api/settings', {
@@ -178,6 +183,38 @@ async function recordHotkey() {
 async function clearHotkey() {
     await fetch('/api/hotkeys/clear', { method: 'POST' });
     document.getElementById('hotkey-display').innerHTML = `Current: <strong>None</strong>`;
+}
+
+// Auto-Turbo handling
+function renderAutoApps() {
+    const container = document.getElementById('auto-apps-list');
+    container.innerHTML = '';
+    autoTurboApps.forEach((app, index) => {
+        const chip = document.createElement('div');
+        chip.className = 'app-chip';
+        chip.innerHTML = `
+            <span>${app}</span>
+            <button onclick="removeAutoApp(${index})">&times;</button>
+        `;
+        container.appendChild(chip);
+    });
+}
+
+function addAutoApp() {
+    const inp = document.getElementById('inp-auto-app');
+    const val = inp.value.trim();
+    if (val && !autoTurboApps.includes(val)) {
+        autoTurboApps.push(val);
+        inp.value = '';
+        renderAutoApps();
+        saveSettings();
+    }
+}
+
+function removeAutoApp(index) {
+    autoTurboApps.splice(index, 1);
+    renderAutoApps();
+    saveSettings();
 }
 
 // Init

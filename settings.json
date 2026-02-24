@@ -3,8 +3,10 @@
     "battery_threshold": 20,
     "thermal_control": true,
     "thermal_limit": 90,
-    "autostart": false,
+    "autostart": true,
     "hotkey_enabled": true,
     "hotkey": "ctrl+shift+t",
-    "minimize_to_tray": true
+    "minimize_to_tray": true,
+    "auto_turbo_enabled": true,
+    "auto_turbo_apps": []
 }

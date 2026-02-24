@@ -30,6 +30,26 @@ class SystemMonitor:
         """Immediately returns the last cached CPU temperature."""
         return self._last_temp
 
+    def is_any_app_running(self, target_apps):
+        """Checks if any application in the target_apps list is currently running."""
+        if not target_apps:
+            return False
+            
+        target_apps_lower = [app.lower() for app in target_apps]
+        
+        try:
+            for proc in psutil.process_iter(['name']):
+                try:
+                    name = proc.info.get('name')
+                    if name and name.lower() in target_apps_lower:
+                        return True
+                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                    pass
+        except Exception as e:
+            print(f"[Monitor] Process iteration error: {e}")
+            
+        return False
+
     def _update_loop(self):
         """Persistent background loop to poll hardware metrics."""
         # Initialize COM once for this thread

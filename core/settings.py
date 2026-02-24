@@ -29,7 +29,10 @@ class SettingsManager:
             "hotkey_enabled": True,
             "hotkey": "ctrl+shift+t",
             
-            "minimize_to_tray": True
+            "minimize_to_tray": True,
+            
+            "auto_turbo_enabled": False,
+            "auto_turbo_apps": []
         }
         
         self.settings = self.load()

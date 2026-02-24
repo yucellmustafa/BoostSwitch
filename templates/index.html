@@ -121,6 +121,28 @@
                         </div>
                     </div>
 
+                    <div class="setting-row" style="flex-direction: column; align-items: flex-start;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
+                            <div class="s-info">
+                                <h4>Auto-Turbo Apps</h4>
+                                <p>Enable Turbo automatically when these apps run (e.g. game.exe).</p>
+                            </div>
+                            <div class="s-action">
+                                <label class="toggle">
+                                    <input type="checkbox" id="chk-auto-turbo" onchange="saveSettings()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; width: 100%;">
+                            <input type="text" id="inp-auto-app" placeholder="e.g. Cyberpunk2077.exe" style="flex: 1;" onkeypress="if(event.key === 'Enter') addAutoApp()">
+                            <button class="btn-secondary" onclick="addAutoApp()">Add</button>
+                        </div>
+                        <div id="auto-apps-list" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; width: 100%;">
+                            <!-- Chips will be rendered here -->
+                        </div>
+                    </div>
+
                     <div class="setting-row last">
                         <div class="s-info">
                             <h4>Auto-Start with Windows</h4>
