@@ -32,7 +32,8 @@ class TrayApp:
             "temp": None,
             "battery": None,
             "dark_mode": None,
-            "is_plugged": None
+            "is_plugged": None,
+            "turbo_visible": None
         }
 
     def create_image(self, ac_on=False, dc_on=False, dark_mode=False, is_plugged=None):
@@ -89,6 +90,7 @@ class TrayApp:
         # Protect dark_mode and is_plugged from being wiped out
         current_dark = self._last_state.get("dark_mode")
         current_plugged = self._last_state.get("is_plugged")
+        current_turbo_visible = self.engine.is_turbo_visible()
 
         # Update tracking state
         self._last_state = {
@@ -97,7 +99,8 @@ class TrayApp:
             "temp": temp_val,
             "battery": battery,
             "dark_mode": current_dark,
-            "is_plugged": current_plugged
+            "is_plugged": current_plugged,
+            "turbo_visible": current_turbo_visible
         }
 
         return pystray.Menu(
@@ -105,6 +108,8 @@ class TrayApp:
             pystray.Menu.SEPARATOR,
             pystray.MenuItem(f"AC Turbo: {ac_status}", self._on_toggle_ac),
             pystray.MenuItem(f"DC Turbo: {dc_status}", self._on_toggle_dc),
+            pystray.Menu.SEPARATOR,
+            pystray.MenuItem("Hide Turbo in Windows" if current_turbo_visible else "Show Turbo in Windows", self._on_toggle_visibility),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Open Dashboard", self._on_show),
             pystray.MenuItem("Exit", self._on_exit)
@@ -124,6 +129,7 @@ class TrayApp:
         
         self._last_state["dark_mode"] = dark_mode
         self._last_state["is_plugged"] = is_plugged
+        self._last_state["turbo_visible"] = self.engine.is_turbo_visible()
         
         # Start background update loop
         self._update_thread = threading.Thread(target=self._update_loop, daemon=True)
@@ -139,11 +145,14 @@ class TrayApp:
                 current_dark_mode = is_dark_mode()
                 bat_pct, is_plugged = self.engine.monitor.get_battery_info()
                 
+                current_turbo_visible = self.engine.is_turbo_visible()
+                
                 state_changed = (
                     self.engine._last_ac != self._last_state["ac"] or
                     self.engine._last_dc != self._last_state["dc"] or
                     temp_val != self._last_state["temp"] or
-                    self.engine._last_battery != self._last_state["battery"]
+                    self.engine._last_battery != self._last_state["battery"] or
+                    current_turbo_visible != self._last_state.get("turbo_visible")
                 )
                 
                 icon_changed = (
@@ -182,6 +191,11 @@ class TrayApp:
         self.icon.menu = self._get_menu() # Immediate update
         bat_pct, is_plugged = self.engine.monitor.get_battery_info()
         self.icon.icon = self.create_image(self.engine._last_ac, self.engine._last_dc, is_dark_mode(), is_plugged)
+
+    def _on_toggle_visibility(self, icon, item):
+        visible = self.engine.is_turbo_visible()
+        self.engine.set_turbo_visibility(not visible)
+        self.icon.menu = self._get_menu() # Immediate update
 
 
     def _on_exit(self, icon, item):

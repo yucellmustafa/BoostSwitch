@@ -2,6 +2,7 @@ import threading
 import time
 import subprocess
 import re
+import winreg
 
 class TurboEngine:
     def __init__(self, settings, monitor):
@@ -100,6 +101,23 @@ class TurboEngine:
             self.change_state("AC", not ac_on)
         else:
             self.change_state("DC", not dc_on)
+
+    def is_turbo_visible(self):
+        try:
+            registry = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
+            key_path = rf"SYSTEM\CurrentControlSet\Control\Power\PowerSettings\{self.SUBGROUP_GUID}\{self.SETTING_GUID}"
+            key = winreg.OpenKey(registry, key_path)
+            value, _ = winreg.QueryValueEx(key, "Attributes")
+            winreg.CloseKey(key)
+            winreg.CloseKey(registry)
+            return value == 0
+        except Exception:
+            return False
+
+    def set_turbo_visibility(self, visible=True):
+        attrib = "-ATTRIB_HIDE" if visible else "+ATTRIB_HIDE"
+        cmd = f"powercfg -attributes SUB_PROCESSOR {self.SETTING_GUID} {attrib}"
+        self.run_command(cmd)
 
     def add_listener(self, func):
         """Register callback for UI updates. Func should accept (ac_on, dc_on, temp, battery, active_apps)"""
